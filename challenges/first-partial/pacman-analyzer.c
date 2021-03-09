@@ -6,10 +6,8 @@
 
 #define REPORT_FILE "packages_report.txt"
 #define MAX_NAME 255
-#define MAX_DATE_INSTALL 50
-#define MAX_DATE_UPDATE 50
-#define MAX_DATE_REMOVE 50
-#define TABLE_SIZE 30
+#define MAX_DATE 50
+#define TABLE_SIZE 100
 
 
 void analizeLog(char *logFile); // char *report);
@@ -20,19 +18,14 @@ void analizeLog(char *logFile); // char *report);
 //void print_table();
 
 typedef struct paquetes{
-    char *name;
-    char *install_date;
-    char *last_update;
-    int *updates;
-    char *removal_date;
+    char name[MAX_NAME];
+    char install_date[MAX_DATE];
+    char last_update[MAX_DATE];
+    int updates;
+    char removal_date[MAX_DATE];
 
     struct paquetes *next;
 } paquetes; 
-
-//typedef struct node{
-//    paquetes p;
-//    struct node *next;
-//}//node_t;
 
 paquetes * hash_table[TABLE_SIZE];
 
@@ -52,7 +45,16 @@ void init_hash_table(){
     }  
 }   
 
-bool hash_table_insert(paquetes *p){
+bool hash_table_insert(char name[MAX_NAME], char install_date[MAX_DATE], char last_update[MAX_DATE], int updates,char removal_date[MAX_DATE]){
+    paquetes *p;
+    p = (paquetes*)malloc(sizeof(paquetes));
+
+    strcpy(p->name,name);
+    strcpy(p->install_date,install_date);
+    strcpy(p->last_update,last_update);
+    p->updates = updates;
+    strcpy(p->removal_date,removal_date);
+
     if (p == NULL) return false;
     int index = hash(p->name);
     p->next = hash_table[index];
@@ -85,28 +87,6 @@ void print_table(){
     }  
 } 
 
-/*void push(node_t ** head,char *nombre, char install_date, char last_update, int updates, char removal_date){
-    node_t * new_node;
-    new_node = (node_t*) malloc(sizeof(node_t));
-
-    new_node->p.name = nombre;
-    new_node->p.install_date = install_date;
-    new_node->p.last_update = last_update;
-    new_node->p.updates = updates;
-    new_node->p.removal_date = removal_date;
-
-    //hash_table_insert(&new_node->p);
-    new_node->next = *head;
-    *head = new_node;
-}
-void print_list(node_t * head){
-    node_t * current =  head;
-    while(current!= NULL){
-        printf("%s\n", current->p.name);
-        current = current->next;
-    }
-}*/
-
 int main(int argc, char **argv) {
 
     if (argc < 2) {
@@ -122,19 +102,6 @@ int main(int argc, char **argv) {
 
     analizeLog(argv[1]);
 
-    //paquetes one = {.name="gcc", .install_date="2020",.last_update="2021",.updates=4,.removal_date="2022"};
-    //paquetes two = {.name="lolca", .install_date="2020",.last_update="2021",.updates=4,.removal_date="2022"};
-    //paquetes three = {.name="kkk", .install_date="2020",.last_update="2021",.updates=4,.removal_date="2022"};
-    //paquetes four = {.name="pepe", .install_date="2020",.last_update="2021",.updates=4,.removal_date="2022"};
-    //paquetes five = {.name="lola", .install_date="2020",.last_update="2021",.updates=4,.removal_date="2022"};
-
-    //hash_table_insert(&one);
-    //hash_table_insert(&two);
-    //hash_table_insert(&three);
-    //hash_table_insert(&four);
-    //hash_table_insert(&five);
-
-    //print_table();
     return 0;
 }
 
@@ -159,59 +126,88 @@ void analizeLog(char *logFile) {
     int upgraded_packages = 0;
     int current_installed = 0;
 
+    int alpm_script = 0;
+    int alpm = 0;
+    int pacman = 0;
+
     char name_tmp[MAX_NAME];
-    char install_date_tmp[MAX_DATE_INSTALL];
-    char last_update_tmp[MAX_DATE_UPDATE];
+    char install_date_tmp[MAX_DATE];
+    char last_update_tmp[MAX_DATE];
     int updates_tmp;
-    char removal_date_tmp[MAX_DATE_REMOVE];
+    char removal_date_tmp[MAX_DATE];
 
-    /*node_t * head = NULL;
-    head = (node_t*)malloc(sizeof(node_t));
-    paquetes pack_tmp; //={.name=" ", .install_date=" ",.last_update=" ",.updates=0,.removal_date=" "};
-    head->p = pack_tmp;*/
-
-    while((read = getline(&line, &len, archivo)) != -1 && contador<20){
+    while((read = getline(&line, &len, archivo)) != -1 && contador<805){
         contador++;
+        printf("hola en contador %d \n",contador);
 
         char *cadena[100];
         int i =0;
 
         char *token = strtok(line, " ");
         while(token!=NULL){
-            printf("esto vale el token %s \n", token);
             cadena[i] = token;
             i++;
             token = strtok(NULL," ");
         }
-        
+
+        printf("esto hay en cadena 2 %s \n",cadena[2]);
+
         if(strcmp(cadena[2],"installed")==0){
             installed_packages++;
-
+            current_installed++;
             strcpy(name_tmp,cadena[3]);
             strcpy(install_date_tmp,cadena[0]);
-
-            //push(&head,*name_tmp,*install_date_tmp,"NONE",0,"NONE");
-
-            paquetes pack = {.name=name_tmp, .install_date=install_date_tmp,.last_update=" ",.updates=0,.removal_date=" "};
-            //paquetes tmp;
-            //memcpy(&tmp,&pack,sizeof(pack));
-            hash_table_insert(&pack);
-
-            //free(tmp);
+            hash_table_insert(name_tmp,install_date_tmp,"-",0,"-");
         }
-        if(strcmp(cadena[2],"upgraded")==0){
+        else if(strcmp(cadena[2],"upgraded")==0){
+            printf("entre");
             upgraded_packages++;
-            hash(cadena[3]);
-
-
+            strcpy(last_update_tmp,cadena[0]);
+            paquetes *p = hash_table_lookup(cadena[3]); 
+            strcpy(p->last_update,last_update_tmp);
+            p->updates = p->updates+1;
+        }
+        /*
+        if(strcmp(cadena[2],"removed")==0){
+            removed_packages++;
+            current_installed--;
+            strcpy(removal_date_tmp,cadena[0]);
+            paquetes *p = hash_table_lookup(cadena[3]); 
+            strcpy(p->removal_date,removal_date_tmp);
+            printf("removi el valor %s",cadena[3]);
+        }
+        /*if(strcmp(cadena[2],"removed")==0){
+            removed_packages++;
+            current_installed--;
+            strcpy(last_update_tmp,cadena[0]);
+            paquetes *p = hash(cadena[3]);
+            strcpy(p->last_update,last_update_tmp);
+            p->updates = p->updates+1;
+        }
+        if(strcmp(cadena[2],"removed")==0){
+            removed_packages++;
+            current_installed--;
+            strcpy(last_update_tmp,cadena[0]);
+            paquetes *p = hash(cadena[3]);
+            strcpy(p->last_update,last_update_tmp);
+            p->updates = p->updates+1;
         }
 
-        //memcpy(line,cadena,sizeof(line));
-        //print_table();
+        if (strcmp(cadena[1],"[ALPM-SCRIPTLET]")==0){
+            alpm_script++;
+        }
+        if (strcmp(cadena[1],"[ALPM]")==0){
+            alpm++;
+        }
+        if (strcmp(cadena[1],"[PACMAN]")==0){
+            pacman++;
+        }*/
+        memcpy(line,cadena,sizeof(line));
+
 
     }
-
     print_table();
+    
 
     // Implement your solution here.
 
