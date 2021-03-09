@@ -794,7 +794,6 @@
 [2020-04-10T18:31:45+0000] [PACMAN] synchronizing package lists
 [2020-04-10T18:31:45+0000] [PACMAN] starting full system upgrade
 [2020-04-10T18:31:46+0000] [ALPM] transaction started
-[2020-04-10T18:31:46+0000] [ALPM] upgraded docker-compose (1.25.4-1 -> 1.25.5-1)
 [2020-04-10T18:31:46+0000] [ALPM] transaction completed
 [2020-04-10T18:31:46+0000] [ALPM] running '30-systemd-update.hook'...
 [2020-04-14T16:13:57+0000] [PACMAN] Running 'pacman -Sy'

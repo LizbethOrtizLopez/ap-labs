@@ -5,12 +5,13 @@
 #include <stdlib.h>
 
 #define REPORT_FILE "packages_report.txt"
-#define MAX_NAME 255
-#define MAX_DATE 50
-#define TABLE_SIZE 100
+#define MAX_NAME 1000
+#define MAX_DATE 1000
+#define TABLE_SIZE 200
 
 
-void analizeLog(char *logFile); // char *report);
+//void analizeLog(char *logFile, char *report); 
+void analizeLog(char *logFile);
 //unsigned int hash(char *name);
 //void init_hash_table();
 //bool hash_table_insert(paquetes *p);
@@ -33,9 +34,10 @@ unsigned int hash(char *name){
     int length = strnlen(name,MAX_NAME);
     unsigned int hash_value = 0;
     for (int i=0; i<length; i++){
-        hash_value += name[i];
-        hash_value = (hash_value * name[i])% TABLE_SIZE;
+        hash_value = hash_value + name[i];
+        hash_value = (hash_value * name[i]);
     } 
+    hash_value= hash_value % TABLE_SIZE;
     return hash_value;   
 } 
 
@@ -94,19 +96,17 @@ int main(int argc, char **argv) {
 	    return 1;
     }
 
-    //printf("%s",argv[1]);
-
-    //analizeLog(argv[1], REPORT_FILE);
-
     init_hash_table;
+
+    //analizeLog(argv[2],argv[4]);
 
     analizeLog(argv[1]);
 
     return 0;
 }
 
-void analizeLog(char *logFile) { 
-    //char *report) {
+void analizeLog(char *logFile){ 
+// char *report) { 
     
     printf("Generating Report from: [%s] log file\n", logFile);
 
@@ -116,9 +116,10 @@ void analizeLog(char *logFile) {
     ssize_t read;
 
     archivo = fopen(logFile, "r");
-    //if (archivo == NULL)
-     //   exit();
-
+    if (archivo == NULL){
+        exit(1);
+    }
+       
     int contador =0;
 
     int installed_packages = 0;
@@ -136,11 +137,15 @@ void analizeLog(char *logFile) {
     int updates_tmp;
     char removal_date_tmp[MAX_DATE];
 
-    while((read = getline(&line, &len, archivo)) != -1 && contador<805){
+    char *oldest_package;
+    char *newest_package;
+
+    while((read = getline(&line, &len, archivo)) != -1 && contador<100){
         contador++;
         printf("hola en contador %d \n",contador);
 
-        char *cadena[100];
+        char *cadena[1000];
+        char *tmp;
         int i =0;
 
         char *token = strtok(line, " ");
@@ -150,67 +155,90 @@ void analizeLog(char *logFile) {
             token = strtok(NULL," ");
         }
 
-        printf("esto hay en cadena 2 %s \n",cadena[2]);
+        if((strcmp(cadena[2],"installed")==0) || (strcmp(cadena[3],"installed")==0)){
 
-        if(strcmp(cadena[2],"installed")==0){
+            if (strcmp(cadena[2],"installed")==0) {
+                tmp = strcat(cadena[3],cadena[4]);
+            }else{
+                tmp = strcat(cadena[4],cadena[5]);
+            } 
+
+            printf("hi");
+
             installed_packages++;
             current_installed++;
-            strcpy(name_tmp,cadena[3]);
+            if (contador==1) strcpy(oldest_package,tmp);
+            strcpy(newest_package,tmp);
+            strcpy(name_tmp,tmp);
             strcpy(install_date_tmp,cadena[0]);
             hash_table_insert(name_tmp,install_date_tmp,"-",0,"-");
         }
-        else if(strcmp(cadena[2],"upgraded")==0){
+        /*if((strcmp(cadena[2],"upgraded")==0) || (strcmp(cadena[3],"upgraded")==0)){
             printf("entre");
+            char *tmp;
+            if (strcmp(cadena[2],"upgraded")==0) {
+                tmp = strcat(cadena[3],cadena[4]);
+            }else{
+                tmp = strcat(cadena[4],cadena[5]);
+            } 
             upgraded_packages++;
             strcpy(last_update_tmp,cadena[0]);
-            paquetes *p = hash_table_lookup(cadena[3]); 
+            paquetes *p = hash_table_lookup(tmp); 
             strcpy(p->last_update,last_update_tmp);
             p->updates = p->updates+1;
-        }
-        /*
-        if(strcmp(cadena[2],"removed")==0){
+        }*/
+        
+        if((strcmp(cadena[2],"removed")==0) || (strcmp(cadena[3],"removed")==0)){
+            if (strcmp(cadena[2],"removed")==0) {
+                tmp = strcat(cadena[3],cadena[4]);
+            }else{
+                tmp = strcat(cadena[4],cadena[5]);
+            }
+
             removed_packages++;
-            current_installed--;
+            current_installed--; 
             strcpy(removal_date_tmp,cadena[0]);
-            paquetes *p = hash_table_lookup(cadena[3]); 
+            paquetes *p = hash_table_lookup(tmp); 
             strcpy(p->removal_date,removal_date_tmp);
-            printf("removi el valor %s",cadena[3]);
-        }
-        /*if(strcmp(cadena[2],"removed")==0){
-            removed_packages++;
-            current_installed--;
-            strcpy(last_update_tmp,cadena[0]);
-            paquetes *p = hash(cadena[3]);
-            strcpy(p->last_update,last_update_tmp);
-            p->updates = p->updates+1;
-        }
-        if(strcmp(cadena[2],"removed")==0){
-            removed_packages++;
-            current_installed--;
-            strcpy(last_update_tmp,cadena[0]);
-            paquetes *p = hash(cadena[3]);
-            strcpy(p->last_update,last_update_tmp);
-            p->updates = p->updates+1;
+            printf("removi el valor %s",tmp);
         }
 
-        if (strcmp(cadena[1],"[ALPM-SCRIPTLET]")==0){
+        if (strcmp(cadena[1],"[ALPM-SCRIPTLET]")==0 || strcmp(cadena[2],"[ALPM-SCRIPTLET]")==0){
             alpm_script++;
         }
-        if (strcmp(cadena[1],"[ALPM]")==0){
+        if (strcmp(cadena[1],"[ALPM]")==0 || strcmp(cadena[1],"[ALPM]")==0){
             alpm++;
         }
-        if (strcmp(cadena[1],"[PACMAN]")==0){
+        if (strcmp(cadena[1],"[PACMAN]")==0 || strcmp(cadena[1],"[PACMAN]")==0 ){
             pacman++;
-        }*/
+        }
         memcpy(line,cadena,sizeof(line));
-
-
     }
     print_table();
-    
+    fclose(archivo);
 
-    // Implement your solution here.
+    /*FILE * reporte;
 
-    //printf("Report is generated at: [%s]\n", report);
+    reporte = fopen(REPORT_FILE,"w");
+
+    fprintf(reporte,"Pacman Packages Report \n");
+    fprintf(reporte,"---------------------- \n");
+    fprintf(reporte,"-Installed Packages :  %d\n",installed_packages);
+    fprintf(reporte,"-Removed Packages :  %d\n",removed_packages);
+    fprintf(reporte,"-Upgraded Packages :  %d\n",upgraded_packages);
+    fprintf(reporte,"-Current Packages :  %d\n",current_installed);
+    fprintf(reporte,"---------------------- \n");
+    fprintf(reporte,"General Stats \n");
+    fprintf(reporte,"---------------------- \n");
+    fprintf(reporte,"-Oldest Packages :  %s\n",oldest_package);
+    fprintf(reporte,"-Newest Packages :  %s\n",newest_package);
+    fprintf(reporte,"-Packages with no upgrades :  \n");
+    fprintf(reporte,"-[ALPM-SCRIPTLET] type count :  %d\n",alpm_script);
+    fprintf(reporte,"-[ALPM] count :  %d\n",alpm);
+    fprintf(reporte,"-[PACMAN] count :  %d\n",pacman);
+
+    fclose(reporte);
+
+    printf("Report is generated at: [%s]\n",REPORT_FILE);*/
 }
 
