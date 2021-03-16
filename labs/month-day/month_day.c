@@ -1,46 +1,54 @@
 #include <stdio.h>
-#include <stdio.h>
-#include <stdbool.h>
+#include <stdlib.h>
+
 
 /* month_day function's prototype*/
-void month_day(int year, int year_day, int *pmonth, int *pday);
+int month_day(int year, int year_day);
 
-static char *months[] = {"Ilegal month","January","February","March",
-                        "April","May","June","July","August","September",
-                        "October","November","December"};
-static int days[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,17,19,20,
-                        21,22,23,24,25,26,27,28,29,30,31};
+static char *months[12] = {"Jan","Feb","Mar","Apr","May","June","July","Aug","Sep",
+                    "Oct","Nov","Dec"};
 
-static int *final_days[] = {31,28,31,30,31,30,31,31,30,31,30,31};
+static int final_days[] = {0,31,28,31,30,31,30,31,31,30,31,30,31};
 
-int main(int argc, int *argv[]) {
-    //hi
+int main(int argc, char *argv[]) {
 
     if(argc==3){
-        if (argv[1]<=0 || argv[1]>366){
-            printf("Error. Invalid day");
+        if (atoi(argv[2])<=0 || atoi(argv[2])>366){
+            printf("Error. Invalid day. \n");
+            return 0;
         }
+        month_day(atoi(argv[1]),atoi(argv[2]));
     }
     else{
-        printf("Error. Wrong numer of arguments");
+        printf("Error. Wrong number of arguments. \n");
         return 0;
     }
-    //if ()
-    //bool bisiesto = false;
-
     return 0;
 }
-
-void month_day(int year, int year_day, int *pmonth, int *pday){
+int month_day(int year, int year_day){
     
-    if (year%4==0){
-        //bisiesto
-        if (year%100!=0 || year%400==0){
-            final_days[1] = 29;
+    if (year%4==0)
+    {
+        if (year%100!=0 || year%400==0)
+        {
+            final_days[2] = 29; //es bisiesto
+        }
+        else
+        {
+            if (year_day==366){ //no es bisiesto
+                printf("Error. Invalid day");
+                return 0;
+            }
         }
     }
+    int acum_days = year_day;
+    int i = -1;
 
-
-
-
+    while(acum_days>31)
+    {
+        i++;
+        acum_days -= final_days[i];
+    }
+    printf("%s %d, %d \n",months[i],acum_days,year);
+    return 0;
 }
