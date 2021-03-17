@@ -1,3 +1,5 @@
+//Lizbeth Ortiz Lopez
+
 #include <stdio.h>
 #include <stdlib.h>
 
