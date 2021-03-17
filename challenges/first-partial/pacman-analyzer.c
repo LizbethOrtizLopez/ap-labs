@@ -151,7 +151,7 @@ void analizeLog(char *logFile, char *report) {
             cadena[i] = token;
             i++;
             token = strtok(NULL," ");
-        }
+        }//prueba
 
         //we can compare specific words into the array
 
