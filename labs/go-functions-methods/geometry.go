@@ -6,8 +6,8 @@
 // Package geometry defines simple types for plane geometry.
 //!+point
 
-//Lizbeth Ortiz Lopez
-//A00227346
+//Lizbeth Ortiz Lopez.
+//A00227346.
 package main
 
 import (
