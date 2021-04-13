@@ -1,3 +1,6 @@
+//Lizbeth Ortiz Lopez
+//A00227346
+
 #include<stdio.h> 
 #include<stdarg.h>		
 #include<signal.h>
@@ -35,5 +38,4 @@ void panicf(const char *format, ...){
     va_start(args,format);
     vprintf(format,args);
     va_end(args);
-    //raise(SIGABRT);
 }
