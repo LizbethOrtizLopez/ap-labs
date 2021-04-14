@@ -5,9 +5,9 @@ Lab - Logger Library
 
 How to run it: 
 
-gcc -c testLogger.c -o testLogger.o
-gcc -c logger.c -o logger.o
-gcc testLogger.o logger.o -o main.o
+- gcc -c testLogger.c -o testLogger.o
+- gcc -c logger.c -o logger.o
+- gcc testLogger.o logger.o -o main.o
 
 ---------------------------
 
