@@ -1,6 +1,16 @@
 Lab - Logger Library
 ====================
 
+¡ UPDATE !
+
+How to run it: 
+
+gcc -c testLogger.c -o testLogger.o
+gcc -c logger.c -o logger.o
+gcc testLogger.o logger.o -o main.o
+
+---------------------------
+
 Implement a Logger library in C that will be used for printing the following types of messages.
 - `INFO` General information.
 - `WARN` Warnings.

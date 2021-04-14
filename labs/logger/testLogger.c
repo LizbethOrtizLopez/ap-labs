@@ -1,5 +1,5 @@
 //Lizbeth Ortiz Lopez
-//A00227346
+//A00227346.
 
 #include <stdio.h>
 #include<stdlib.h>
