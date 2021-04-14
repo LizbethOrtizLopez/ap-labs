@@ -3,7 +3,6 @@
 
 #include<stdio.h> 
 #include<stdarg.h>		
-#include<signal.h>
 
 #define backgroud 48 //black
 

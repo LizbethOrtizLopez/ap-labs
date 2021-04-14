@@ -1,7 +1,7 @@
 Lab - Logger Library
 ====================
 
-¡ UPDATE !
+¡¡ UPDATE !!
 
 How to run it: 
 
